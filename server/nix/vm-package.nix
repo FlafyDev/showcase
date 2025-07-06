@@ -61,7 +61,7 @@
             }
           ];
           graphics.enable = true;
-          mem = 1024;
+          mem = 4096;
           vcpu = 2;
         };
 

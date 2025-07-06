@@ -1520,18 +1520,296 @@ class SubmissionsCompanion extends UpdateCompanion<Submission> {
   }
 }
 
+class $AccessesTable extends Accesses
+    with TableInfo<$AccessesTable, AccessesData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AccessesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _accessIDMeta =
+      const VerificationMeta('accessID');
+  @override
+  late final GeneratedColumn<int> accessID = GeneratedColumn<int>(
+      'access_i_d', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _gdAccountIDMeta =
+      const VerificationMeta('gdAccountID');
+  @override
+  late final GeneratedColumn<int> gdAccountID = GeneratedColumn<int>(
+      'gd_account_i_d', aliasedName, true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES users (account_i_d)'));
+  static const VerificationMeta _levelIDMeta =
+      const VerificationMeta('levelID');
+  @override
+  late final GeneratedColumn<int> levelID = GeneratedColumn<int>(
+      'level_i_d', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES levels (level_i_d)'));
+  static const VerificationMeta _accessTimeMeta =
+      const VerificationMeta('accessTime');
+  @override
+  late final GeneratedColumn<DateTime> accessTime = GeneratedColumn<DateTime>(
+      'access_time', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [accessID, gdAccountID, levelID, accessTime];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'accesses';
+  @override
+  VerificationContext validateIntegrity(Insertable<AccessesData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('access_i_d')) {
+      context.handle(_accessIDMeta,
+          accessID.isAcceptableOrUnknown(data['access_i_d']!, _accessIDMeta));
+    }
+    if (data.containsKey('gd_account_i_d')) {
+      context.handle(
+          _gdAccountIDMeta,
+          gdAccountID.isAcceptableOrUnknown(
+              data['gd_account_i_d']!, _gdAccountIDMeta));
+    }
+    if (data.containsKey('level_i_d')) {
+      context.handle(_levelIDMeta,
+          levelID.isAcceptableOrUnknown(data['level_i_d']!, _levelIDMeta));
+    } else if (isInserting) {
+      context.missing(_levelIDMeta);
+    }
+    if (data.containsKey('access_time')) {
+      context.handle(
+          _accessTimeMeta,
+          accessTime.isAcceptableOrUnknown(
+              data['access_time']!, _accessTimeMeta));
+    } else if (isInserting) {
+      context.missing(_accessTimeMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {accessID};
+  @override
+  AccessesData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AccessesData(
+      accessID: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}access_i_d'])!,
+      gdAccountID: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}gd_account_i_d']),
+      levelID: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}level_i_d'])!,
+      accessTime: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}access_time'])!,
+    );
+  }
+
+  @override
+  $AccessesTable createAlias(String alias) {
+    return $AccessesTable(attachedDatabase, alias);
+  }
+}
+
+class AccessesData extends DataClass implements Insertable<AccessesData> {
+  final int accessID;
+  final int? gdAccountID;
+  final int levelID;
+  final DateTime accessTime;
+  const AccessesData(
+      {required this.accessID,
+      this.gdAccountID,
+      required this.levelID,
+      required this.accessTime});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['access_i_d'] = Variable<int>(accessID);
+    if (!nullToAbsent || gdAccountID != null) {
+      map['gd_account_i_d'] = Variable<int>(gdAccountID);
+    }
+    map['level_i_d'] = Variable<int>(levelID);
+    map['access_time'] = Variable<DateTime>(accessTime);
+    return map;
+  }
+
+  AccessesCompanion toCompanion(bool nullToAbsent) {
+    return AccessesCompanion(
+      accessID: Value(accessID),
+      gdAccountID: gdAccountID == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gdAccountID),
+      levelID: Value(levelID),
+      accessTime: Value(accessTime),
+    );
+  }
+
+  factory AccessesData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AccessesData(
+      accessID: serializer.fromJson<int>(json['accessID']),
+      gdAccountID: serializer.fromJson<int?>(json['gdAccountID']),
+      levelID: serializer.fromJson<int>(json['levelID']),
+      accessTime: serializer.fromJson<DateTime>(json['accessTime']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'accessID': serializer.toJson<int>(accessID),
+      'gdAccountID': serializer.toJson<int?>(gdAccountID),
+      'levelID': serializer.toJson<int>(levelID),
+      'accessTime': serializer.toJson<DateTime>(accessTime),
+    };
+  }
+
+  AccessesData copyWith(
+          {int? accessID,
+          Value<int?> gdAccountID = const Value.absent(),
+          int? levelID,
+          DateTime? accessTime}) =>
+      AccessesData(
+        accessID: accessID ?? this.accessID,
+        gdAccountID: gdAccountID.present ? gdAccountID.value : this.gdAccountID,
+        levelID: levelID ?? this.levelID,
+        accessTime: accessTime ?? this.accessTime,
+      );
+  AccessesData copyWithCompanion(AccessesCompanion data) {
+    return AccessesData(
+      accessID: data.accessID.present ? data.accessID.value : this.accessID,
+      gdAccountID:
+          data.gdAccountID.present ? data.gdAccountID.value : this.gdAccountID,
+      levelID: data.levelID.present ? data.levelID.value : this.levelID,
+      accessTime:
+          data.accessTime.present ? data.accessTime.value : this.accessTime,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AccessesData(')
+          ..write('accessID: $accessID, ')
+          ..write('gdAccountID: $gdAccountID, ')
+          ..write('levelID: $levelID, ')
+          ..write('accessTime: $accessTime')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(accessID, gdAccountID, levelID, accessTime);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AccessesData &&
+          other.accessID == this.accessID &&
+          other.gdAccountID == this.gdAccountID &&
+          other.levelID == this.levelID &&
+          other.accessTime == this.accessTime);
+}
+
+class AccessesCompanion extends UpdateCompanion<AccessesData> {
+  final Value<int> accessID;
+  final Value<int?> gdAccountID;
+  final Value<int> levelID;
+  final Value<DateTime> accessTime;
+  const AccessesCompanion({
+    this.accessID = const Value.absent(),
+    this.gdAccountID = const Value.absent(),
+    this.levelID = const Value.absent(),
+    this.accessTime = const Value.absent(),
+  });
+  AccessesCompanion.insert({
+    this.accessID = const Value.absent(),
+    this.gdAccountID = const Value.absent(),
+    required int levelID,
+    required DateTime accessTime,
+  })  : levelID = Value(levelID),
+        accessTime = Value(accessTime);
+  static Insertable<AccessesData> custom({
+    Expression<int>? accessID,
+    Expression<int>? gdAccountID,
+    Expression<int>? levelID,
+    Expression<DateTime>? accessTime,
+  }) {
+    return RawValuesInsertable({
+      if (accessID != null) 'access_i_d': accessID,
+      if (gdAccountID != null) 'gd_account_i_d': gdAccountID,
+      if (levelID != null) 'level_i_d': levelID,
+      if (accessTime != null) 'access_time': accessTime,
+    });
+  }
+
+  AccessesCompanion copyWith(
+      {Value<int>? accessID,
+      Value<int?>? gdAccountID,
+      Value<int>? levelID,
+      Value<DateTime>? accessTime}) {
+    return AccessesCompanion(
+      accessID: accessID ?? this.accessID,
+      gdAccountID: gdAccountID ?? this.gdAccountID,
+      levelID: levelID ?? this.levelID,
+      accessTime: accessTime ?? this.accessTime,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (accessID.present) {
+      map['access_i_d'] = Variable<int>(accessID.value);
+    }
+    if (gdAccountID.present) {
+      map['gd_account_i_d'] = Variable<int>(gdAccountID.value);
+    }
+    if (levelID.present) {
+      map['level_i_d'] = Variable<int>(levelID.value);
+    }
+    if (accessTime.present) {
+      map['access_time'] = Variable<DateTime>(accessTime.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AccessesCompanion(')
+          ..write('accessID: $accessID, ')
+          ..write('gdAccountID: $gdAccountID, ')
+          ..write('levelID: $levelID, ')
+          ..write('accessTime: $accessTime')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$ShowcaseDatabase extends GeneratedDatabase {
   _$ShowcaseDatabase(QueryExecutor e) : super(e);
   $ShowcaseDatabaseManager get managers => $ShowcaseDatabaseManager(this);
   late final $LevelsTable levels = $LevelsTable(this);
   late final $UsersTable users = $UsersTable(this);
   late final $SubmissionsTable submissions = $SubmissionsTable(this);
+  late final $AccessesTable accesses = $AccessesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [levels, users, submissions];
+      [levels, users, submissions, accesses];
 }
 
 typedef $$LevelsTableCreateCompanionBuilder = LevelsCompanion Function({
@@ -1577,6 +1855,21 @@ final class $$LevelsTableReferences
             f.levelID.levelID.sqlEquals($_itemColumn<int>('level_i_d')!));
 
     final cache = $_typedResult.readTableOrNull(_submissionsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$AccessesTable, List<AccessesData>>
+      _accessesRefsTable(_$ShowcaseDatabase db) =>
+          MultiTypedResultKey.fromTable(db.accesses,
+              aliasName:
+                  $_aliasNameGenerator(db.levels.levelID, db.accesses.levelID));
+
+  $$AccessesTableProcessedTableManager get accessesRefs {
+    final manager = $$AccessesTableTableManager($_db, $_db.accesses).filter(
+        (f) => f.levelID.levelID.sqlEquals($_itemColumn<int>('level_i_d')!));
+
+    final cache = $_typedResult.readTableOrNull(_accessesRefsTable($_db));
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
@@ -1638,6 +1931,27 @@ class $$LevelsTableFilterComposer
             $$SubmissionsTableFilterComposer(
               $db: $db,
               $table: $db.submissions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> accessesRefs(
+      Expression<bool> Function($$AccessesTableFilterComposer f) f) {
+    final $$AccessesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.levelID,
+        referencedTable: $db.accesses,
+        getReferencedColumn: (t) => t.levelID,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AccessesTableFilterComposer(
+              $db: $db,
+              $table: $db.accesses,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -1752,6 +2066,27 @@ class $$LevelsTableAnnotationComposer
             ));
     return f(composer);
   }
+
+  Expression<T> accessesRefs<T extends Object>(
+      Expression<T> Function($$AccessesTableAnnotationComposer a) f) {
+    final $$AccessesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.levelID,
+        referencedTable: $db.accesses,
+        getReferencedColumn: (t) => t.levelID,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AccessesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.accesses,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$LevelsTableTableManager extends RootTableManager<
@@ -1765,7 +2100,7 @@ class $$LevelsTableTableManager extends RootTableManager<
     $$LevelsTableUpdateCompanionBuilder,
     (Level, $$LevelsTableReferences),
     Level,
-    PrefetchHooks Function({bool submissionsRefs})> {
+    PrefetchHooks Function({bool submissionsRefs, bool accessesRefs})> {
   $$LevelsTableTableManager(_$ShowcaseDatabase db, $LevelsTable table)
       : super(TableManagerState(
           db: db,
@@ -1832,10 +2167,14 @@ class $$LevelsTableTableManager extends RootTableManager<
               .map((e) =>
                   (e.readTable(table), $$LevelsTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({submissionsRefs = false}) {
+          prefetchHooksCallback: (
+              {submissionsRefs = false, accessesRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (submissionsRefs) db.submissions],
+              explicitlyWatchedTables: [
+                if (submissionsRefs) db.submissions,
+                if (accessesRefs) db.accesses
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
@@ -1847,6 +2186,18 @@ class $$LevelsTableTableManager extends RootTableManager<
                         managerFromTypedResult: (p0) =>
                             $$LevelsTableReferences(db, table, p0)
                                 .submissionsRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.levelID == item.levelID),
+                        typedResults: items),
+                  if (accessesRefs)
+                    await $_getPrefetchedData<Level, $LevelsTable,
+                            AccessesData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$LevelsTableReferences._accessesRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$LevelsTableReferences(db, table, p0).accessesRefs,
                         referencedItemsForCurrentItem:
                             (item, referencedItems) => referencedItems
                                 .where((e) => e.levelID == item.levelID),
@@ -1869,7 +2220,7 @@ typedef $$LevelsTableProcessedTableManager = ProcessedTableManager<
     $$LevelsTableUpdateCompanionBuilder,
     (Level, $$LevelsTableReferences),
     Level,
-    PrefetchHooks Function({bool submissionsRefs})>;
+    PrefetchHooks Function({bool submissionsRefs, bool accessesRefs})>;
 typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
   required int accountID,
   required String cachedUsername,
@@ -1903,6 +2254,22 @@ final class $$UsersTableReferences
             .sqlEquals($_itemColumn<int>('account_i_d')!));
 
     final cache = $_typedResult.readTableOrNull(_submissionsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$AccessesTable, List<AccessesData>>
+      _accessesRefsTable(_$ShowcaseDatabase db) =>
+          MultiTypedResultKey.fromTable(db.accesses,
+              aliasName: $_aliasNameGenerator(
+                  db.users.accountID, db.accesses.gdAccountID));
+
+  $$AccessesTableProcessedTableManager get accessesRefs {
+    final manager = $$AccessesTableTableManager($_db, $_db.accesses).filter(
+        (f) => f.gdAccountID.accountID
+            .sqlEquals($_itemColumn<int>('account_i_d')!));
+
+    final cache = $_typedResult.readTableOrNull(_accessesRefsTable($_db));
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
@@ -1947,6 +2314,27 @@ class $$UsersTableFilterComposer
             $$SubmissionsTableFilterComposer(
               $db: $db,
               $table: $db.submissions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> accessesRefs(
+      Expression<bool> Function($$AccessesTableFilterComposer f) f) {
+    final $$AccessesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.accountID,
+        referencedTable: $db.accesses,
+        getReferencedColumn: (t) => t.gdAccountID,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AccessesTableFilterComposer(
+              $db: $db,
+              $table: $db.accesses,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -2028,6 +2416,27 @@ class $$UsersTableAnnotationComposer
             ));
     return f(composer);
   }
+
+  Expression<T> accessesRefs<T extends Object>(
+      Expression<T> Function($$AccessesTableAnnotationComposer a) f) {
+    final $$AccessesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.accountID,
+        referencedTable: $db.accesses,
+        getReferencedColumn: (t) => t.gdAccountID,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$AccessesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.accesses,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$UsersTableTableManager extends RootTableManager<
@@ -2041,7 +2450,7 @@ class $$UsersTableTableManager extends RootTableManager<
     $$UsersTableUpdateCompanionBuilder,
     (User, $$UsersTableReferences),
     User,
-    PrefetchHooks Function({bool submissionsRefs})> {
+    PrefetchHooks Function({bool submissionsRefs, bool accessesRefs})> {
   $$UsersTableTableManager(_$ShowcaseDatabase db, $UsersTable table)
       : super(TableManagerState(
           db: db,
@@ -2088,10 +2497,14 @@ class $$UsersTableTableManager extends RootTableManager<
               .map((e) =>
                   (e.readTable(table), $$UsersTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({submissionsRefs = false}) {
+          prefetchHooksCallback: (
+              {submissionsRefs = false, accessesRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (submissionsRefs) db.submissions],
+              explicitlyWatchedTables: [
+                if (submissionsRefs) db.submissions,
+                if (accessesRefs) db.accesses
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
@@ -2103,6 +2516,17 @@ class $$UsersTableTableManager extends RootTableManager<
                         managerFromTypedResult: (p0) =>
                             $$UsersTableReferences(db, table, p0)
                                 .submissionsRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.gdAccountID == item.accountID),
+                        typedResults: items),
+                  if (accessesRefs)
+                    await $_getPrefetchedData<User, $UsersTable, AccessesData>(
+                        currentTable: table,
+                        referencedTable:
+                            $$UsersTableReferences._accessesRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$UsersTableReferences(db, table, p0).accessesRefs,
                         referencedItemsForCurrentItem:
                             (item, referencedItems) => referencedItems
                                 .where((e) => e.gdAccountID == item.accountID),
@@ -2125,7 +2549,7 @@ typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
     $$UsersTableUpdateCompanionBuilder,
     (User, $$UsersTableReferences),
     User,
-    PrefetchHooks Function({bool submissionsRefs})>;
+    PrefetchHooks Function({bool submissionsRefs, bool accessesRefs})>;
 typedef $$SubmissionsTableCreateCompanionBuilder = SubmissionsCompanion
     Function({
   Value<int> id,
@@ -2582,6 +3006,333 @@ typedef $$SubmissionsTableProcessedTableManager = ProcessedTableManager<
     (Submission, $$SubmissionsTableReferences),
     Submission,
     PrefetchHooks Function({bool levelID, bool gdAccountID})>;
+typedef $$AccessesTableCreateCompanionBuilder = AccessesCompanion Function({
+  Value<int> accessID,
+  Value<int?> gdAccountID,
+  required int levelID,
+  required DateTime accessTime,
+});
+typedef $$AccessesTableUpdateCompanionBuilder = AccessesCompanion Function({
+  Value<int> accessID,
+  Value<int?> gdAccountID,
+  Value<int> levelID,
+  Value<DateTime> accessTime,
+});
+
+final class $$AccessesTableReferences
+    extends BaseReferences<_$ShowcaseDatabase, $AccessesTable, AccessesData> {
+  $$AccessesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $UsersTable _gdAccountIDTable(_$ShowcaseDatabase db) =>
+      db.users.createAlias(
+          $_aliasNameGenerator(db.accesses.gdAccountID, db.users.accountID));
+
+  $$UsersTableProcessedTableManager? get gdAccountID {
+    final $_column = $_itemColumn<int>('gd_account_i_d');
+    if ($_column == null) return null;
+    final manager = $$UsersTableTableManager($_db, $_db.users)
+        .filter((f) => f.accountID.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gdAccountIDTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static $LevelsTable _levelIDTable(_$ShowcaseDatabase db) =>
+      db.levels.createAlias(
+          $_aliasNameGenerator(db.accesses.levelID, db.levels.levelID));
+
+  $$LevelsTableProcessedTableManager get levelID {
+    final $_column = $_itemColumn<int>('level_i_d')!;
+
+    final manager = $$LevelsTableTableManager($_db, $_db.levels)
+        .filter((f) => f.levelID.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_levelIDTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$AccessesTableFilterComposer
+    extends Composer<_$ShowcaseDatabase, $AccessesTable> {
+  $$AccessesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get accessID => $composableBuilder(
+      column: $table.accessID, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get accessTime => $composableBuilder(
+      column: $table.accessTime, builder: (column) => ColumnFilters(column));
+
+  $$UsersTableFilterComposer get gdAccountID {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.gdAccountID,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.accountID,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableFilterComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$LevelsTableFilterComposer get levelID {
+    final $$LevelsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.levelID,
+        referencedTable: $db.levels,
+        getReferencedColumn: (t) => t.levelID,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$LevelsTableFilterComposer(
+              $db: $db,
+              $table: $db.levels,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$AccessesTableOrderingComposer
+    extends Composer<_$ShowcaseDatabase, $AccessesTable> {
+  $$AccessesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get accessID => $composableBuilder(
+      column: $table.accessID, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get accessTime => $composableBuilder(
+      column: $table.accessTime, builder: (column) => ColumnOrderings(column));
+
+  $$UsersTableOrderingComposer get gdAccountID {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.gdAccountID,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.accountID,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableOrderingComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$LevelsTableOrderingComposer get levelID {
+    final $$LevelsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.levelID,
+        referencedTable: $db.levels,
+        getReferencedColumn: (t) => t.levelID,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$LevelsTableOrderingComposer(
+              $db: $db,
+              $table: $db.levels,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$AccessesTableAnnotationComposer
+    extends Composer<_$ShowcaseDatabase, $AccessesTable> {
+  $$AccessesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get accessID =>
+      $composableBuilder(column: $table.accessID, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get accessTime => $composableBuilder(
+      column: $table.accessTime, builder: (column) => column);
+
+  $$UsersTableAnnotationComposer get gdAccountID {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.gdAccountID,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.accountID,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$LevelsTableAnnotationComposer get levelID {
+    final $$LevelsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.levelID,
+        referencedTable: $db.levels,
+        getReferencedColumn: (t) => t.levelID,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$LevelsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.levels,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$AccessesTableTableManager extends RootTableManager<
+    _$ShowcaseDatabase,
+    $AccessesTable,
+    AccessesData,
+    $$AccessesTableFilterComposer,
+    $$AccessesTableOrderingComposer,
+    $$AccessesTableAnnotationComposer,
+    $$AccessesTableCreateCompanionBuilder,
+    $$AccessesTableUpdateCompanionBuilder,
+    (AccessesData, $$AccessesTableReferences),
+    AccessesData,
+    PrefetchHooks Function({bool gdAccountID, bool levelID})> {
+  $$AccessesTableTableManager(_$ShowcaseDatabase db, $AccessesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AccessesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AccessesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AccessesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> accessID = const Value.absent(),
+            Value<int?> gdAccountID = const Value.absent(),
+            Value<int> levelID = const Value.absent(),
+            Value<DateTime> accessTime = const Value.absent(),
+          }) =>
+              AccessesCompanion(
+            accessID: accessID,
+            gdAccountID: gdAccountID,
+            levelID: levelID,
+            accessTime: accessTime,
+          ),
+          createCompanionCallback: ({
+            Value<int> accessID = const Value.absent(),
+            Value<int?> gdAccountID = const Value.absent(),
+            required int levelID,
+            required DateTime accessTime,
+          }) =>
+              AccessesCompanion.insert(
+            accessID: accessID,
+            gdAccountID: gdAccountID,
+            levelID: levelID,
+            accessTime: accessTime,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$AccessesTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({gdAccountID = false, levelID = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (gdAccountID) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.gdAccountID,
+                    referencedTable:
+                        $$AccessesTableReferences._gdAccountIDTable(db),
+                    referencedColumn: $$AccessesTableReferences
+                        ._gdAccountIDTable(db)
+                        .accountID,
+                  ) as T;
+                }
+                if (levelID) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.levelID,
+                    referencedTable:
+                        $$AccessesTableReferences._levelIDTable(db),
+                    referencedColumn:
+                        $$AccessesTableReferences._levelIDTable(db).levelID,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$AccessesTableProcessedTableManager = ProcessedTableManager<
+    _$ShowcaseDatabase,
+    $AccessesTable,
+    AccessesData,
+    $$AccessesTableFilterComposer,
+    $$AccessesTableOrderingComposer,
+    $$AccessesTableAnnotationComposer,
+    $$AccessesTableCreateCompanionBuilder,
+    $$AccessesTableUpdateCompanionBuilder,
+    (AccessesData, $$AccessesTableReferences),
+    AccessesData,
+    PrefetchHooks Function({bool gdAccountID, bool levelID})>;
 
 class $ShowcaseDatabaseManager {
   final _$ShowcaseDatabase _db;
@@ -2592,4 +3343,6 @@ class $ShowcaseDatabaseManager {
       $$UsersTableTableManager(_db, _db.users);
   $$SubmissionsTableTableManager get submissions =>
       $$SubmissionsTableTableManager(_db, _db.submissions);
+  $$AccessesTableTableManager get accesses =>
+      $$AccessesTableTableManager(_db, _db.accesses);
 }

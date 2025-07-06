@@ -170,11 +170,17 @@ class ShowcaseServer {
         return Response.notFound("Bad gd/mod versions");
       }
       print("Getting replay for level: ${body.levelID}");
+
+      print("Increasing access...");
+      await addLevelToDB(levelID: body.levelID, addedAccesses: 1);
+
+      print("Looking for replay...");
       final submission = await getSubmissionForLevel(body.levelID);
       if (submission == null) {
         return Response.notFound("No replay found for level ${body.levelID}");
       }
       print("Got valid replay");
+
       return Response.ok(base64.encode(submission.replayData!));
     });
 
@@ -230,18 +236,21 @@ class ShowcaseServer {
                   "User-Agent": "",
                 },
               );
+
+              final resBody = utf8.decode(res.bodyBytes, allowMalformed: true);
+
               if (res.statusCode != 200) {
                 feedback = ReplayFeedback.userBadInput;
                 break;
               }
-              if (res.body == "-1") {
+              if (resBody == "-1") {
                 feedback = ReplayFeedback.userBadInput;
                 break;
               }
-              Map<String, String> infoDict = {};
-              print(res.body);
 
-              List<String> sections = res.body.split("#");
+              print(resBody);
+
+              List<String> sections = resBody.split("#");
 
               final levelInfoDict = parseGDDict(sections[0]);
               final creatorInfoDict = parseGDDict(sections[1]);
@@ -249,8 +258,9 @@ class ShowcaseServer {
               final levelName = levelInfoDict["2"];
               final levelCreatorID = levelInfoDict["6"];
               final levelCreator = creatorInfoDict[levelCreatorID];
-              final levelDescription =
-                  utf8.decode(base64.decode(levelInfoDict["3"]!));
+              final levelDescription = utf8.decode(
+                  base64.decode(levelInfoDict["3"]!),
+                  allowMalformed: true);
               final levelVersion = int.parse(levelInfoDict["5"]!);
               final levelStars = int.parse(levelInfoDict["18"]!);
               final levelLikes = int.parse(levelInfoDict["14"]!);
@@ -343,18 +353,22 @@ class ShowcaseServer {
                   "User-Agent": "",
                 },
               );
-              if (res.statusCode != 200) {
+
+              final resLevelDataBody =
+                  utf8.decode(resLevelData.bodyBytes, allowMalformed: true);
+
+              if (resLevelData.statusCode != 200) {
                 feedback = ReplayFeedback.userBadInput;
                 break;
               }
-              if (res.body == "-1") {
+              if (resLevelDataBody == "-1") {
                 feedback = ReplayFeedback.userBadInput;
                 break;
               }
 
               // write in level.dat what level to play
               await gdLevelDataFile.writeAsString(
-                resLevelData.body.split("#")[0],
+                resLevelDataBody.split("#")[0],
               );
 
               // write in replay.gdr2 the replay data
@@ -375,7 +389,7 @@ class ShowcaseServer {
               while (!await gdResponseFile.exists() &&
                   await _isProcessAlive(process)) {
                 await Future.delayed(Duration(milliseconds: 1000));
-                if (DateTime.now().difference(startTime).inSeconds > 60) {
+                if (DateTime.now().difference(startTime).inSeconds > 150) {
                   feedback = ReplayFeedback.timedOut;
                   break;
                 }
@@ -456,7 +470,7 @@ class ShowcaseServer {
         .write(
       SubmissionsCompanion.custom(
         status: Variable(SubmissionStatus.rejected.index),
-        replayData: Variable(null),
+        // replayData: Variable(null),
         rejectionReason:
             db.submissions.rejectionReason + Variable(formattedReason),
         reviewedAt: Variable(DateTime.now()),
@@ -478,6 +492,15 @@ class ShowcaseServer {
     final acceptedSubmission = await getSubmissionForLevel(submission.levelID);
     if (acceptedSubmission != null) {
       return SubmissionEvaluation.notNeeded;
+    }
+
+    // HACK
+    if (submission.dataBase64 != null) {
+      final dataLength = base64.decode(submission.dataBase64!).length;
+      if (dataLength < 50) {
+        print("The submission's replay is smaller than 100 bytes");
+        return SubmissionEvaluation.notNeeded;
+      }
     }
 
     // not needed if user already has 10 pending submissions
@@ -642,6 +665,7 @@ class ShowcaseServer {
     int? cachedLikes,
     LevelDifficulty? cachedDifficulty,
     int addedAccesses = 0,
+    int? accessedAccount,
   }) async {
     final existingLevel = await (db.select(db.levels)
           ..where((tbl) => tbl.levelID.equals(levelID))
@@ -701,6 +725,26 @@ class ShowcaseServer {
               lastCacheUpdateAt: Value(DateTime.now()),
             ),
           );
+    }
+
+    if (addedAccesses > 0) {
+      final timestamp = DateTime.now();
+
+      await db.batch(
+        (batch) {
+          batch.insertAll(
+            db.accesses,
+            List.generate(
+              addedAccesses,
+              (_) => AccessesCompanion(
+                gdAccountID: Value(accessedAccount),
+                levelID: Value(levelID),
+                accessTime: Value(timestamp),
+              ),
+            ),
+          );
+        },
+      );
     }
   }
 

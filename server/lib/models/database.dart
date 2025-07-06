@@ -63,7 +63,14 @@ class Users extends Table {
   DateTimeColumn get lastCacheUpdateAt => dateTime()();
 }
 
-@DriftDatabase(tables: [Submissions, Levels, Users])
+class Accesses extends Table {
+  IntColumn get accessID => integer().autoIncrement()();
+  IntColumn get gdAccountID => integer().references(Users, #accountID).nullable()();
+  IntColumn get levelID => integer().references(Levels, #levelID)();
+  DateTimeColumn get accessTime => dateTime()();
+}
+
+@DriftDatabase(tables: [Submissions, Levels, Users, Accesses])
 class ShowcaseDatabase extends _$ShowcaseDatabase {
   ShowcaseDatabase({
     required String host,
@@ -89,7 +96,7 @@ class ShowcaseDatabase extends _$ShowcaseDatabase {
         );
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -98,6 +105,9 @@ class ShowcaseDatabase extends _$ShowcaseDatabase {
             await migrator.addColumn(submissions, submissions.levelVersion);
             await migrator.addColumn(levels, levels.cachedVersion);
             await migrator.addColumn(levels, levels.accesses);
+          }
+          if (from < 3) {
+            await migrator.createTable(accesses);
           }
         },
       );
