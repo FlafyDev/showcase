@@ -171,15 +171,16 @@ class ShowcaseServer {
       }
       print("Getting replay for level: ${body.levelID}");
 
+      Stopwatch stopwatch = new Stopwatch()..start();
       print("Increasing access...");
       await addLevelToDB(levelID: body.levelID, addedAccesses: 1);
 
       print("Looking for replay...");
       final submission = await getSubmissionForLevel(body.levelID);
       if (submission == null) {
-        return Response.notFound("No replay found for level ${body.levelID}");
+        return Response.notFound("No replay found for level ${body.levelID} in ${stopwatch.elapsed.inMilliseconds} ms");
       }
-      print("Got valid replay");
+      print("Got valid replay in ${stopwatch.elapsed.inMilliseconds} ms");
 
       return Response.ok(base64.encode(submission.replayData!));
     });
