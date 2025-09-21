@@ -1,0 +1,31 @@
+{
+	"geode": "4.7.0",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074"
+	},
+	"id": "flafy.showcase",
+	"name": "Showcase",
+	"version": "v3.0.0",
+	"developer": "Flafy",
+	"description": "Upload and play gameplay of rated levels",
+	"links": {
+		"source": "https://github.com/flafydev/showcase"
+	},
+	"tags": [
+		"online",
+		"modtober24"
+	],
+	"dependencies": {
+		"geode.node-ids": {
+			"version": ">=v1.18.0",
+			"importance": "required"
+		}
+	},
+	"resources": {
+		"sprites": [
+			"resources/clapper.png",
+			"resources/auto-button-example.png"
+		]
+	}
+}
