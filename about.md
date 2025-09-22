@@ -6,6 +6,8 @@ This mod adds an **auto-complete button** to rated levels. When pressed, the mod
 
 When you play rated or popular levels, your playthrough is securely sent to the server. After verification, this data will help power the various features of the mod for other players as well.
 
+Officially supported only on Windows and Android.
+
 ## Authentication
 
 To prevent spam, the mod connects with your Geometry Dash account using the Dashauth protocol.
