@@ -43,7 +43,7 @@ std::filesystem::path APIManager::getUploadDir() const { return m_uploadDir; }
 
 std::string APIManager::getBaseURL() const { return m_baseURL; };
 std::string APIManager::getEndpoint(const std::string &endpoint) const {
-  return std::format("{}/{}", m_baseURL, endpoint);
+  return fmt::format("{}/{}", m_baseURL, endpoint);
 };
 
 void APIManager::setDashAuthToken(const std::optional<std::string> &token) {
