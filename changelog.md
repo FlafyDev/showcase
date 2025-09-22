@@ -1,3 +1,7 @@
+# v3.0.1
+
+- Experimental MacOS and iOS support.
+
 # v3.0.0
 
 - Complete rewrite of the mod and backend to run on a larger scale.
